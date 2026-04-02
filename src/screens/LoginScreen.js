@@ -74,12 +74,12 @@ const LoginScreen = () => {
       Animated.timing(logoAnimation, {
         toValue: 1,
         duration: 1000,
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== "web",
       }),
       Animated.timing(formAnimation, {
         toValue: 1,
         duration: 1200,
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== "web",
       }),
     ]).start();
 
@@ -89,12 +89,12 @@ const LoginScreen = () => {
         Animated.timing(ballAnimation, {
           toValue: 1,
           duration: 2000,
-          useNativeDriver: true,
+          useNativeDriver: Platform.OS !== "web",
         }),
         Animated.timing(ballAnimation, {
           toValue: 0,
           duration: 2000,
-          useNativeDriver: true,
+          useNativeDriver: Platform.OS !== "web",
         }),
       ]),
     );

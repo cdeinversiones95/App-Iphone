@@ -86,7 +86,7 @@ class AuthService {
       }
 
       // Crear el perfil de usuario manualmente
-      const { data: newUser, error: userError } = await supabase
+      let { data: newUser, error: userError } = await supabase
         .from("users")
         .insert({
           auth_id: userId,
@@ -283,11 +283,18 @@ class AuthService {
   async signOut() {
     try {
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      if (error) {
+        // Si falla el servidor, limpiar sesión local garantizadamente
+        await supabase.auth.signOut({ scope: "local" });
+      }
       return { error: null };
     } catch (error) {
       console.error("Error en signOut:", error);
-      return { error: error.message };
+      // Asegurar cierre de sesión local aunque falle el servidor
+      try {
+        await supabase.auth.signOut({ scope: "local" });
+      } catch {}
+      return { error: null };
     }
   }
 

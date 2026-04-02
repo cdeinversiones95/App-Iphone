@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
+import { Platform } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
 import * as SecureStore from "expo-secure-store";
 
 const BIOMETRIC_CREDENTIALS_KEY = "biometric_credentials";
 const BIOMETRIC_ENABLED_KEY = "biometric_enabled";
+
+// Biometrics and SecureStore are native-only — not available on web
+const IS_WEB = Platform.OS === "web";
 
 export const useBiometricAuth = () => {
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
@@ -12,6 +16,12 @@ export const useBiometricAuth = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (IS_WEB) {
+      setIsBiometricSupported(false);
+      setIsBiometricEnabled(false);
+      setLoading(false);
+      return;
+    }
     checkBiometricSupport();
     loadBiometricSettings();
   }, []);
@@ -52,6 +62,7 @@ export const useBiometricAuth = () => {
   };
 
   const enableBiometricAuth = async (email, password) => {
+    if (IS_WEB) return { success: false, error: "No disponible en web" };
     try {
       // Verificar que hay autenticación biométrica disponible
       const enrolled = await LocalAuthentication.isEnrolledAsync();
@@ -75,6 +86,7 @@ export const useBiometricAuth = () => {
   };
 
   const disableBiometricAuth = async () => {
+    if (IS_WEB) return { success: false, error: "No disponible en web" };
     try {
       await SecureStore.deleteItemAsync(BIOMETRIC_CREDENTIALS_KEY);
       await SecureStore.setItemAsync(BIOMETRIC_ENABLED_KEY, "false");
@@ -87,6 +99,7 @@ export const useBiometricAuth = () => {
   };
 
   const authenticateWithBiometrics = async () => {
+    if (IS_WEB) return { success: false, error: "No disponible en web" };
     try {
       // Verificar que la autenticación biométrica está habilitada
       if (!isBiometricEnabled) {

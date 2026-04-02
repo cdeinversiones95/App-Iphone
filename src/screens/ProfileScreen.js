@@ -111,32 +111,37 @@ const ProfileScreen = ({ navigation }) => {
   const getStatusInfo = getDepositStatusInfo;
   const formatDate = formatDateTime;
 
-  const handleLogout = () => {
-    Alert.alert(
-      "⚽ Cerrar Sesión",
-      "¿Estás seguro de que quieres salir del campo?",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel",
-        },
-        {
-          text: "Salir",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await signOut();
-              Alert.alert(
-                "👋 ¡Hasta luego!",
-                "Has salido del campo exitosamente",
-              );
-            } catch (error) {
-              Alert.alert("❌ Error", "No se pudo cerrar la sesión");
-            }
+  const handleLogout = async () => {
+    const doLogout = async () => {
+      try {
+        await signOut();
+      } catch (error) {
+        Alert.alert("❌ Error", "No se pudo cerrar la sesión");
+      }
+    };
+
+    if (Platform.OS === "web") {
+      // En web, window.confirm() es más confiable que Alert.alert
+      if (window.confirm("¿Estás seguro de que quieres salir del campo?")) {
+        await doLogout();
+      }
+    } else {
+      Alert.alert(
+        "⚽ Cerrar Sesión",
+        "¿Estás seguro de que quieres salir del campo?",
+        [
+          {
+            text: "Cancelar",
+            style: "cancel",
           },
-        },
-      ],
-    );
+          {
+            text: "Salir",
+            style: "destructive",
+            onPress: doLogout,
+          },
+        ],
+      );
+    }
   };
 
   const handleBiometricToggle = async () => {
