@@ -109,24 +109,21 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signIn = async (username, password) => {
-    setLoading(true);
+    // NO usar setLoading(true) aquí — AppNavigator desmonta LoginScreen
+    // al ver loading=true, y si hay error el usuario nunca lo ve.
+    // LoginScreen maneja su propio estado de carga.
     try {
       const result = await AuthService.signIn(username, password);
-      // MOBILE WEB FIX: no depender de onAuthStateChange para actualizar
-      // el estado — en Safari móvil el listener puede no dispararse si
-      // el storage falla. Actualizamos user/session directamente aquí.
       if (!result.error && result.data?.user) {
         setUser(result.data.user);
         setSession(result.data.session);
-        // Cargar perfil de BD
         try {
           const { data: profile } = await AuthService.getUserProfile(
             result.data.user.id,
           );
           setUserProfile(
             profile || {
-              username:
-                result.data.user.user_metadata?.username || "Usuario",
+              username: result.data.user.user_metadata?.username || "Usuario",
               display_name:
                 result.data.user.user_metadata?.display_name || "Usuario",
               full_name:
@@ -136,16 +133,15 @@ export const AuthProvider = ({ children }) => {
         } catch {}
       }
       return result;
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      return { data: null, error: err.message || "Error durante el login" };
     }
   };
 
   const signUp = async (username, password, userData) => {
-    setLoading(true);
+    // NO usar setLoading(true) aquí — misma razón que signIn.
     try {
       const result = await AuthService.signUp(username, password, userData);
-      // MOBILE WEB FIX: igual que signIn, actualizar estado directamente
       if (!result.error && result.data?.user) {
         setUser(result.data.user);
         setSession(result.data.session);
@@ -155,8 +151,7 @@ export const AuthProvider = ({ children }) => {
           );
           setUserProfile(
             profile || {
-              username:
-                result.data.user.user_metadata?.username || "Usuario",
+              username: result.data.user.user_metadata?.username || "Usuario",
               display_name:
                 result.data.user.user_metadata?.display_name || "Usuario",
               full_name:
@@ -166,21 +161,24 @@ export const AuthProvider = ({ children }) => {
         } catch {}
       }
       return result;
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      return { data: null, error: err.message || "Error durante el registro" };
     }
   };
 
   const signOut = async () => {
-    setLoading(true);
     try {
       const result = await AuthService.signOut();
       setUser(null);
       setUserProfile(null);
       setSession(null);
       return result;
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      // Forzar limpieza local aunque falle el servidor
+      setUser(null);
+      setUserProfile(null);
+      setSession(null);
+      return { error: err.message };
     }
   };
 

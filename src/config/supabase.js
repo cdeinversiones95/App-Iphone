@@ -12,26 +12,53 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 
 // Adaptador de storage seguro para web (Safari ITP / modo privado hacen que
 // localStorage.setItem lance QuotaExceededError — hay que atrapar eso).
+// Se usa un Map en memoria como fallback para que la sesión sobreviva
+// al menos durante la vida de la pestaña.
+const memoryFallback = new Map();
+
+function isLocalStorageAvailable() {
+  try {
+    const testKey = "__supabase_storage_test__";
+    window.localStorage.setItem(testKey, "1");
+    window.localStorage.removeItem(testKey);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const _useLocalStorage =
+  typeof window !== "undefined" && isLocalStorageAvailable();
+
 const webStorageAdapter = {
   getItem: (key) => {
     try {
-      return Promise.resolve(window.localStorage.getItem(key));
+      if (_useLocalStorage) {
+        return Promise.resolve(window.localStorage.getItem(key));
+      }
+      return Promise.resolve(memoryFallback.get(key) ?? null);
     } catch {
-      return Promise.resolve(null);
+      return Promise.resolve(memoryFallback.get(key) ?? null);
     }
   },
   setItem: (key, value) => {
     try {
-      window.localStorage.setItem(key, value);
+      if (_useLocalStorage) {
+        window.localStorage.setItem(key, value);
+      }
     } catch {
-      // Modo privado de Safari: QuotaExceededError — ignorar silenciosamente
+      // localStorage falló — usar fallback en memoria
     }
+    memoryFallback.set(key, value);
     return Promise.resolve();
   },
   removeItem: (key) => {
     try {
-      window.localStorage.removeItem(key);
+      if (_useLocalStorage) {
+        window.localStorage.removeItem(key);
+      }
     } catch {}
+    memoryFallback.delete(key);
     return Promise.resolve();
   },
 };
@@ -39,8 +66,8 @@ const webStorageAdapter = {
 // En web se usa el adaptador seguro; en nativo AsyncStorage
 const authStorage = Platform.OS === "web" ? webStorageAdapter : AsyncStorage;
 
-// Timeout: 30s en web (conexiones móviles lentas), 15s en nativo
-const FETCH_TIMEOUT = Platform.OS === "web" ? 30000 : 15000;
+// Timeout: 45s en web (conexiones móviles 3G/4G pueden ser lentas), 15s en nativo
+const FETCH_TIMEOUT = Platform.OS === "web" ? 45000 : 15000;
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
@@ -58,10 +85,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 
       if (!config?.signal) {
         const controller = new AbortController();
-        const timeoutId = setTimeout(
-          () => controller.abort(),
-          FETCH_TIMEOUT,
-        );
+        const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
 
         return fetch(resource, {
           ...config,

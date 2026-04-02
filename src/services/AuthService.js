@@ -64,31 +64,114 @@ class AuthService {
           );
         }
 
-        throw authError;
+        // Rate limit de Supabase
+        if (
+          authError.status === 429 ||
+          authError.message.includes("rate limit") ||
+          authError.message.includes("too many requests")
+        ) {
+          throw new Error(
+            "Demasiados intentos. Espera unos minutos antes de intentar de nuevo.",
+          );
+        }
+
+        throw new Error(authError.message || "Error en el registro");
       }
 
       if (!authData || !authData.user) {
         throw new Error("No se pudo crear la cuenta de autenticación");
       }
 
-      // CORRECCIÓN CRÍTICA PARA MOBILE WEB:
-      // En Safari móvil, el JWT del signUp no queda cargado en memoria del cliente
-      // Supabase antes de que se ejecuten los inserts siguientes. Hay que aplicarlo
-      // explícitamente para que las políticas RLS vean al usuario autenticado.
-      if (authData.session) {
-        await supabase.auth.setSession({
-          access_token: authData.session.access_token,
-          refresh_token: authData.session.refresh_token,
-        });
-      } else {
-        // Session nula = Supabase tiene confirmación de email activa.
-        // El usuario fue creado pero no puede hacer nada hasta confirmar.
+      // DETECCIÓN DE USUARIO DUPLICADO (respuesta "fake" de Supabase v2):
+      // Cuando el email ya existe, Supabase NO devuelve error — devuelve
+      // un user con identities vacío y session null para evitar email enumeration.
+      const identities = authData.user?.identities;
+      if (
+        !authData.session &&
+        Array.isArray(identities) &&
+        identities.length === 0
+      ) {
         throw new Error(
-          "Registro pendiente de confirmación. Contacta al administrador para activar tu cuenta."
+          "Ya existe una cuenta registrada con este número telefónico",
         );
       }
 
+      // MANEJO DE SESSION para mobile web:
+      if (authData.session) {
+        const { error: setError } = await supabase.auth.setSession({
+          access_token: authData.session.access_token,
+          refresh_token: authData.session.refresh_token,
+        });
+        if (setError) {
+          console.warn(
+            "setSession tras signUp falló, intentando signIn:",
+            setError.message,
+          );
+          const { error: signInError } = await supabase.auth.signInWithPassword(
+            {
+              email: tempEmail,
+              password,
+            },
+          );
+          if (signInError) {
+            throw new Error(
+              "No se pudo establecer la sesión. Intenta iniciar sesión manualmente.",
+            );
+          }
+        }
+      } else {
+        // Session nula: intentar autenticar con las credenciales recién creadas.
+        // Esto cubre el caso donde el auth user ya existía de un intento previo
+        // que falló al insertar el perfil en la BD.
+        console.warn(
+          "signUp devolvió session null — intentando signIn como fallback",
+        );
+        const { data: signInData, error: signInError } =
+          await supabase.auth.signInWithPassword({
+            email: tempEmail,
+            password,
+          });
+        if (signInError) {
+          throw new Error(
+            "No se pudo completar el registro. Intenta iniciar sesión con tus datos o contacta soporte.",
+          );
+        }
+        // Reasignar userId al de la sesión real
+        authData.user = signInData.user;
+        authData.session = signInData.session;
+      }
+
       const userId = authData.user.id;
+
+      // Verificar si ya existe un perfil para este auth_id (retry después de fallo parcial)
+      const { data: existingProfile } = await supabase
+        .from("users")
+        .select("*")
+        .eq("auth_id", userId)
+        .maybeSingle();
+
+      if (existingProfile) {
+        // El perfil ya existe — asegurar que también tenga billetera y retornar
+        const { data: existingWallet } = await supabase
+          .from("wallets")
+          .select("id")
+          .eq("user_id", existingProfile.id)
+          .maybeSingle();
+
+        if (!existingWallet) {
+          await supabase.from("wallets").insert({
+            user_id: existingProfile.id,
+            balance: 0.0,
+            total_deposited: 0.0,
+            total_withdrawn: 0.0,
+            total_invested: 0.0,
+            total_profits: 0.0,
+            is_active: true,
+          });
+        }
+
+        return { data: authData, error: null };
+      }
 
       // Generar nuevo código de invitación único
       let newInvitationCode;

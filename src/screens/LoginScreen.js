@@ -54,6 +54,10 @@ const LoginScreen = () => {
     }
   };
 
+  // Guard contra doble-tap en móvil (loading state no se actualiza lo
+  // suficientemente rápido para bloquear un segundo tap en <100ms)
+  const submittingRef = useRef(false);
+
   // Keyboard handling
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const scrollViewRef = useRef(null);
@@ -175,12 +179,18 @@ const LoginScreen = () => {
         );
 
         if (loginResult?.error) {
-          showMessage("error", "Las credenciales guardadas no son válidas. Deshabilita y vuelve a habilitar la autenticación biométrica.");
+          showMessage(
+            "error",
+            "Las credenciales guardadas no son válidas. Deshabilita y vuelve a habilitar la autenticación biométrica.",
+          );
         } else {
           showMessage("success", "⚽ ¡Has ingresado exitosamente!");
         }
       } else {
-        showMessage("error", result.error || "Error en la autenticación biométrica");
+        showMessage(
+          "error",
+          result.error || "Error en la autenticación biométrica",
+        );
       }
     } catch (error) {
       console.error("Error en login biométrico:", error);
@@ -192,38 +202,54 @@ const LoginScreen = () => {
 
   // ✅ Manejo de login/signup
   const handleAuth = async () => {
+    // Prevenir doble-tap en móvil
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+
     setFormMessage(null);
 
     if (!phone || !password) {
       showMessage("error", "Por favor completa todos los campos");
+      submittingRef.current = false;
       return;
     }
 
     // Validar nombre en registro
     if (!isLogin && (!name || name.trim().length < 2)) {
       showMessage("error", "Por favor ingresa tu nombre (mínimo 2 caracteres)");
+      submittingRef.current = false;
       return;
     }
 
     // Validar formato del teléfono
     const phoneDigits = phone.replace(/\D/g, "");
     if (phoneDigits.length < 10) {
-      showMessage("error", "El número telefónico debe tener al menos 10 dígitos");
+      showMessage(
+        "error",
+        "El número telefónico debe tener al menos 10 dígitos",
+      );
+      submittingRef.current = false;
       return;
     }
 
     // Verificar si el teléfono ya existe (solo en registro)
     if (!isLogin && phoneExists) {
-      showMessage("error", "📱 Este número ya tiene una cuenta. Cambia a \"Iniciar Sesión\".");
+      showMessage(
+        "error",
+        '📱 Este número ya tiene una cuenta. Cambia a "Iniciar Sesión".',
+      );
+      submittingRef.current = false;
       return;
     }
 
     if (!isLogin && password !== confirmPassword) {
       showMessage("error", "Las contraseñas no coinciden");
+      submittingRef.current = false;
       return;
     }
     if (password.length < 6) {
       showMessage("error", "La contraseña debe tener al menos 6 caracteres");
+      submittingRef.current = false;
       return;
     }
 
@@ -249,9 +275,13 @@ const LoginScreen = () => {
       }
     } catch (error) {
       console.error("Error en handleAuth:", error);
-      showMessage("error", error.message || "Algo salió mal. Inténtalo de nuevo.");
+      showMessage(
+        "error",
+        error.message || "Algo salió mal. Inténtalo de nuevo.",
+      );
     } finally {
       setLoading(false);
+      submittingRef.current = false;
     }
   };
 
@@ -575,10 +605,14 @@ const LoginScreen = () => {
 
               {/* Mensaje inline de error o éxito */}
               {formMessage && (
-                <View style={[
-                  styles.messageBox,
-                  formMessage.type === "success" ? styles.messageSuccess : styles.messageError
-                ]}>
+                <View
+                  style={[
+                    styles.messageBox,
+                    formMessage.type === "success"
+                      ? styles.messageSuccess
+                      : styles.messageError,
+                  ]}
+                >
                   <Text style={styles.messageText}>{formMessage.text}</Text>
                   <TouchableOpacity onPress={() => setFormMessage(null)}>
                     <Text style={styles.messageClose}>✕</Text>
