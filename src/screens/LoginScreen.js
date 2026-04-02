@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
   Platform,
   StatusBar,
   ActivityIndicator,
@@ -42,8 +41,18 @@ const LoginScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
   const [phoneExists, setPhoneExists] = useState(false);
+  const [formMessage, setFormMessage] = useState(null); // { type: 'error'|'success', text: string }
 
   const { signIn, signUp } = useAuth();
+
+  // Helper para mostrar mensajes inline en lugar de Alert.alert (mobile web bloquea popups)
+  const showMessage = (type, text) => {
+    setFormMessage({ type, text });
+    // Auto-limpiar mensajes de éxito
+    if (type === "success") {
+      setTimeout(() => setFormMessage(null), 4000);
+    }
+  };
 
   // Keyboard handling
   const [keyboardHeight, setKeyboardHeight] = useState(0);
@@ -154,40 +163,28 @@ const LoginScreen = () => {
   // ✅ Manejo de login biométrico
   const handleBiometricLogin = async () => {
     setLoading(true);
+    setFormMessage(null);
 
     try {
       const result = await authenticateWithBiometrics();
 
       if (result.success && result.credentials) {
-        // Realizar login con las credenciales obtenidas
         const loginResult = await signIn(
           result.credentials.email,
           result.credentials.password,
         );
 
         if (loginResult?.error) {
-          Alert.alert(
-            "❌ Error",
-            "Las credenciales guardadas no son válidas. Por favor, deshabilita y vuelve a habilitar la autenticación biométrica.",
-          );
+          showMessage("error", "Las credenciales guardadas no son válidas. Deshabilita y vuelve a habilitar la autenticación biométrica.");
         } else {
-          Alert.alert(
-            "⚽ ¡Gooool!",
-            "¡Has ingresado exitosamente con autenticación biométrica!",
-          );
+          showMessage("success", "⚽ ¡Has ingresado exitosamente!");
         }
       } else {
-        Alert.alert(
-          "❌ Error",
-          result.error || "Error en la autenticación biométrica",
-        );
+        showMessage("error", result.error || "Error en la autenticación biométrica");
       }
     } catch (error) {
       console.error("Error en login biométrico:", error);
-      Alert.alert(
-        "❌ Error",
-        "Error inesperado en la autenticación biométrica",
-      );
+      showMessage("error", "Error inesperado en la autenticación biométrica");
     } finally {
       setLoading(false);
     }
@@ -195,56 +192,38 @@ const LoginScreen = () => {
 
   // ✅ Manejo de login/signup
   const handleAuth = async () => {
+    setFormMessage(null);
+
     if (!phone || !password) {
-      Alert.alert("❌ Error", "Por favor completa todos los campos");
+      showMessage("error", "Por favor completa todos los campos");
       return;
     }
 
     // Validar nombre en registro
     if (!isLogin && (!name || name.trim().length < 2)) {
-      Alert.alert(
-        "❌ Error",
-        "Por favor ingresa tu nombre (mínimo 2 caracteres)",
-      );
+      showMessage("error", "Por favor ingresa tu nombre (mínimo 2 caracteres)");
       return;
     }
 
     // Validar formato del teléfono
     const phoneDigits = phone.replace(/\D/g, "");
     if (phoneDigits.length < 10) {
-      Alert.alert(
-        "❌ Error",
-        "El número telefónico debe tener al menos 10 dígitos",
-      );
+      showMessage("error", "El número telefónico debe tener al menos 10 dígitos");
       return;
     }
 
     // Verificar si el teléfono ya existe (solo en registro)
     if (!isLogin && phoneExists) {
-      Alert.alert(
-        "📱 Número ya registrado",
-        "Este número telefónico ya tiene una cuenta. ¿Quieres iniciar sesión en su lugar?",
-        [
-          { text: "Cancelar", style: "cancel" },
-          {
-            text: "Iniciar Sesión",
-            onPress: () => {
-              setIsLogin(true);
-              setName("");
-              setConfirmPassword("");
-            },
-          },
-        ],
-      );
+      showMessage("error", "📱 Este número ya tiene una cuenta. Cambia a \"Iniciar Sesión\".");
       return;
     }
 
     if (!isLogin && password !== confirmPassword) {
-      Alert.alert("❌ Error", "Las contraseñas no coinciden");
+      showMessage("error", "Las contraseñas no coinciden");
       return;
     }
     if (password.length < 6) {
-      Alert.alert("❌ Error", "La contraseña debe tener al menos 6 caracteres");
+      showMessage("error", "La contraseña debe tener al menos 6 caracteres");
       return;
     }
 
@@ -259,21 +238,18 @@ const LoginScreen = () => {
           });
 
       if (result?.error) {
-        Alert.alert("❌ Error", result.error.message || result.error);
+        showMessage("error", result.error.message || result.error);
       } else {
-        Alert.alert(
-          "⚽ ¡Goool!",
+        showMessage(
+          "success",
           isLogin
-            ? `¡Bienvenido de vuelta al campo!`
-            : `¡${name} se ha unido al equipo de CDE INVERSIONES!`,
+            ? "⚽ ¡Bienvenido de vuelta al campo!"
+            : `🏆 ¡${name} se ha unido al equipo!`,
         );
       }
     } catch (error) {
       console.error("Error en handleAuth:", error);
-      Alert.alert(
-        "❌ Error",
-        error.message || "Algo salió mal. Inténtalo de nuevo.",
-      );
+      showMessage("error", error.message || "Algo salió mal. Inténtalo de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -597,6 +573,19 @@ const LoginScreen = () => {
                   </TouchableOpacity>
                 )}
 
+              {/* Mensaje inline de error o éxito */}
+              {formMessage && (
+                <View style={[
+                  styles.messageBox,
+                  formMessage.type === "success" ? styles.messageSuccess : styles.messageError
+                ]}>
+                  <Text style={styles.messageText}>{formMessage.text}</Text>
+                  <TouchableOpacity onPress={() => setFormMessage(null)}>
+                    <Text style={styles.messageClose}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
               <View style={styles.divider}>
                 <View style={styles.dividerLine} />
                 <Text style={styles.dividerText}>o</Text>
@@ -872,6 +861,38 @@ const styles = StyleSheet.create({
     color: "#3182ce",
     fontWeight: "600",
     textAlign: "center",
+  },
+  messageBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: getBorderRadius(10),
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: getSpacing(1.5),
+    marginTop: getSpacing(0.5),
+  },
+  messageError: {
+    backgroundColor: "#fef2f2",
+    borderWidth: 1,
+    borderColor: "#fca5a5",
+  },
+  messageSuccess: {
+    backgroundColor: "#f0fdf4",
+    borderWidth: 1,
+    borderColor: "#86efac",
+  },
+  messageText: {
+    flex: 1,
+    fontSize: scaleFont(14),
+    fontWeight: "500",
+    color: "#1f2937",
+  },
+  messageClose: {
+    fontSize: scaleFont(14),
+    color: "#6b7280",
+    paddingLeft: 8,
+    fontWeight: "bold",
   },
 });
 
