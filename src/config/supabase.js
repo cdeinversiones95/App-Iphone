@@ -2,24 +2,46 @@ import { createClient } from "@supabase/supabase-js";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Configuración de Supabase - NUEVA BASE DE DATOS MIGRADA (26 Oct 2025)
 const SUPABASE_URL = "https://rqbexzndnzzfbonafzop.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxYmV4em5kbnp6ZmJvbmFmem9wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0OTMzMjYsImV4cCI6MjA3NzA2OTMyNn0.lIIGhNaXnwGpUHKpOVt_LpUfsqyzZVCxA7jHeB2xc6c";
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.error("🚨 ERROR: Configuración de Supabase faltante!");
   throw new Error("Supabase configuration missing");
 }
 
-// En web se usa localStorage nativo del browser (más compatible con mobile Safari).
-// En iOS/Android se usa AsyncStorage (no hay localStorage sincrónico).
-const authStorage = Platform.OS === "web" ? localStorage : AsyncStorage;
+// Adaptador de storage seguro para web (Safari ITP / modo privado hacen que
+// localStorage.setItem lance QuotaExceededError — hay que atrapar eso).
+const webStorageAdapter = {
+  getItem: (key) => {
+    try {
+      return Promise.resolve(window.localStorage.getItem(key));
+    } catch {
+      return Promise.resolve(null);
+    }
+  },
+  setItem: (key, value) => {
+    try {
+      window.localStorage.setItem(key, value);
+    } catch {
+      // Modo privado de Safari: QuotaExceededError — ignorar silenciosamente
+    }
+    return Promise.resolve();
+  },
+  removeItem: (key) => {
+    try {
+      window.localStorage.removeItem(key);
+    } catch {}
+    return Promise.resolve();
+  },
+};
 
-// Timeout más alto en mobile web para conexiones lentas
+// En web se usa el adaptador seguro; en nativo AsyncStorage
+const authStorage = Platform.OS === "web" ? webStorageAdapter : AsyncStorage;
+
+// Timeout: 30s en web (conexiones móviles lentas), 15s en nativo
 const FETCH_TIMEOUT = Platform.OS === "web" ? 30000 : 15000;
 
-// Crear cliente de Supabase con configuración optimizada para React Native y producción
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     autoRefreshToken: true,

@@ -71,11 +71,24 @@ class AuthService {
         throw new Error("No se pudo crear la cuenta de autenticación");
       }
 
+      // CORRECCIÓN CRÍTICA PARA MOBILE WEB:
+      // En Safari móvil, el JWT del signUp no queda cargado en memoria del cliente
+      // Supabase antes de que se ejecuten los inserts siguientes. Hay que aplicarlo
+      // explícitamente para que las políticas RLS vean al usuario autenticado.
+      if (authData.session) {
+        await supabase.auth.setSession({
+          access_token: authData.session.access_token,
+          refresh_token: authData.session.refresh_token,
+        });
+      } else {
+        // Session nula = Supabase tiene confirmación de email activa.
+        // El usuario fue creado pero no puede hacer nada hasta confirmar.
+        throw new Error(
+          "Registro pendiente de confirmación. Contacta al administrador para activar tu cuenta."
+        );
+      }
+
       const userId = authData.user.id;
-
-      // PASO 2: Crear manualmente el perfil y billetera (sin triggers problemáticos)
-
-      const startTime2 = Date.now();
 
       // Generar nuevo código de invitación único
       let newInvitationCode;
