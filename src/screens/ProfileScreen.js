@@ -271,25 +271,19 @@ const ProfileScreen = ({ navigation }) => {
       id: 7,
       title: "Centro de Ayuda",
       icon: "help-circle-outline",
-      onPress: () =>
-        Alert.alert("❓ Ayuda", "Contacta con soporte: soporte@cde.com"),
+      onPress: () => navigation.navigate("HelpCenter"),
     },
     {
       id: 8,
       title: "Acerca de CDE",
       icon: "information-circle-outline",
-      onPress: () =>
-        Alert.alert(
-          "ℹ️ CDE INVERSIONES",
-          "Versión 1.0.0\nPlataforma de inversiones deportivas",
-        ),
+      onPress: () => navigation.navigate("About"),
     },
     {
       id: 9,
       title: "Partner",
       icon: "people-circle-outline",
-      onPress: () =>
-        Alert.alert("🤝 Partner", "Programa de socios próximamente"),
+      onPress: () => navigation.navigate("Partner"),
     },
   ];
 

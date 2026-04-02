@@ -15,6 +15,9 @@ import PaymentInstructionsScreen from "../screens/PaymentInstructionsScreen";
 import USDTPaymentInstructionsScreen from "../screens/USDTPaymentInstructionsScreen";
 import WithdrawalScreen from "../screens/WithdrawalScreen";
 import AgentCenterScreen from "../screens/AgentCenterScreen";
+import HelpCenterScreen from "../screens/HelpCenterScreen";
+import AboutScreen from "../screens/AboutScreen";
+import PartnerScreen from "../screens/PartnerScreen";
 
 const Stack = createStackNavigator();
 
@@ -114,6 +117,21 @@ const AppNavigator = () => {
       <Stack.Screen
         name="AgentCenter"
         component={AgentCenterScreen}
+        options={modalTransition}
+      />
+      <Stack.Screen
+        name="HelpCenter"
+        component={HelpCenterScreen}
+        options={modalTransition}
+      />
+      <Stack.Screen
+        name="About"
+        component={AboutScreen}
+        options={modalTransition}
+      />
+      <Stack.Screen
+        name="Partner"
+        component={PartnerScreen}
         options={modalTransition}
       />
     </Stack.Navigator>
