@@ -1,10 +1,6 @@
 [build]
-  base = "IGF-Admin-Dashboard"
-  command = "npm install && npm run build"
-  publish = ".next"
+  command = "npm install && npx expo export --platform web"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"

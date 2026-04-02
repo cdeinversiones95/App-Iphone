@@ -2,7 +2,7 @@
   "expo": {
     "name": "CDE INVERSIONES",
     "slug": "cde-inversiones",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "icon": "./assets/icon.png",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
@@ -20,7 +20,7 @@
 
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.cde.inversiones",
+      "bundleIdentifier": "com.igf.football",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Esta aplicación necesita acceso a tu galería para que puedas subir comprobantes de pago.",
         "NSCameraUsageDescription": "Esta aplicación necesita acceso a tu cámara para que puedas tomar fotos de tus comprobantes de pago."
@@ -31,8 +31,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 2,
-      "package": "com.cde.inversiones",
+      "versionCode": 3,
+      "package": "com.igf.football",
       "permissions": [
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
