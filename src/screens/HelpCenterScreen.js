@@ -19,8 +19,8 @@ import {
   getSafeBottomPadding,
 } from "../utils/responsive";
 
-const SUPPORT_PHONE = "+40376300829";
-const SUPPORT_PHONE_DISPLAY = "+40 376 300 829";
+const SUPPORT_PHONE = "+40316320076";
+const SUPPORT_PHONE_DISPLAY = "+40 31 632 0076";
 
 const FAQ_ITEMS = [
   {
