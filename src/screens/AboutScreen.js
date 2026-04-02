@@ -83,12 +83,16 @@ const AboutScreen = ({ navigation }) => {
             <View style={styles.presenceCard}>
               <Ionicons name="flag-outline" size={26} color="#3b82f6" />
               <Text style={styles.presenceTitle}>República Dominicana</Text>
-              <Text style={styles.presenceDesc}>Sede principal de operaciones</Text>
+              <Text style={styles.presenceDesc}>
+                Sede principal de operaciones
+              </Text>
             </View>
             <View style={styles.presenceCard}>
               <Ionicons name="football-outline" size={26} color="#fbbf24" />
               <Text style={styles.presenceTitle}>FIFA</Text>
-              <Text style={styles.presenceDesc}>Respaldo y certificación oficial</Text>
+              <Text style={styles.presenceDesc}>
+                Respaldo y certificación oficial
+              </Text>
             </View>
           </View>
         </View>

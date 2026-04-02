@@ -67,11 +67,14 @@ const HelpCenterScreen = ({ navigation }) => {
         if (supported) {
           Linking.openURL(url);
         } else {
-          Alert.alert("WhatsApp no disponible", `Contáctanos al ${SUPPORT_PHONE_DISPLAY}`);
+          Alert.alert(
+            "WhatsApp no disponible",
+            `Contáctanos al ${SUPPORT_PHONE_DISPLAY}`,
+          );
         }
       })
       .catch(() =>
-        Alert.alert("Error", `Contáctanos al ${SUPPORT_PHONE_DISPLAY}`)
+        Alert.alert("Error", `Contáctanos al ${SUPPORT_PHONE_DISPLAY}`),
       );
   };
 
@@ -138,8 +141,18 @@ const HelpCenterScreen = ({ navigation }) => {
           <Text style={styles.sectionTitle}>Contacto Rápido</Text>
           <View style={styles.quickRow}>
             {[
-              { icon: "logo-whatsapp", label: "Chat\nWhatsApp", color: "#25D366", onPress: handleWhatsApp },
-              { icon: "call-outline", label: "Llamada\nDirecta", color: "#3b82f6", onPress: handleCall },
+              {
+                icon: "logo-whatsapp",
+                label: "Chat\nWhatsApp",
+                color: "#25D366",
+                onPress: handleWhatsApp,
+              },
+              {
+                icon: "call-outline",
+                label: "Llamada\nDirecta",
+                color: "#3b82f6",
+                onPress: handleCall,
+              },
             ].map((item, i) => (
               <TouchableOpacity
                 key={i}
@@ -203,9 +216,7 @@ const HelpCenterScreen = ({ navigation }) => {
               onPress={handleWhatsApp}
             >
               <Ionicons name="logo-whatsapp" size={20} color="#fff" />
-              <Text style={styles.stillHelpBtnText}>
-                Hablar con un agente
-              </Text>
+              <Text style={styles.stillHelpBtnText}>Hablar con un agente</Text>
             </TouchableOpacity>
           </View>
         </View>
