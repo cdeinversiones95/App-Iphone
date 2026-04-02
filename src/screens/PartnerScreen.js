@@ -20,7 +20,6 @@ import AuthService from "../services/AuthService";
 import {
   scaleFont,
   getHorizontalPadding,
-  getSpacing,
   getBorderRadius,
   useSafeArea,
   getSafeBottomPadding,
@@ -138,7 +137,7 @@ const PartnerScreen = ({ navigation }) => {
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{
-          paddingBottom: getSafeBottomPadding(insets) + getSpacing(20),
+          paddingBottom: getSafeBottomPadding(insets) + 20,
         }}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -293,7 +292,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: getHorizontalPadding(),
-    paddingVertical: getSpacing(14),
+    paddingVertical: 14,
   },
   backButton: {
     width: 40,
@@ -313,22 +312,22 @@ const styles = StyleSheet.create({
   },
   section: {
     paddingHorizontal: getHorizontalPadding(),
-    marginTop: getSpacing(20),
+    marginTop: 20,
   },
   sectionTitle: {
     fontSize: scaleFont(16),
     fontWeight: "700",
     color: "#1f2937",
-    marginBottom: getSpacing(12),
+    marginBottom: 12,
   },
   levelCard: {
     borderRadius: getBorderRadius(16),
-    padding: getSpacing(20),
+    padding: 20,
   },
   levelHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: getSpacing(16),
+    marginBottom: 16,
   },
   levelLabel: {
     fontSize: scaleFont(12),
@@ -357,7 +356,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   progressSection: {
-    marginTop: getSpacing(16),
+    marginTop: 16,
   },
   progressText: {
     fontSize: scaleFont(12),
@@ -377,7 +376,7 @@ const styles = StyleSheet.create({
   codeCard: {
     backgroundColor: "#fff",
     borderRadius: getBorderRadius(12),
-    padding: getSpacing(16),
+    padding: 16,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -390,7 +389,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: "#1d4ed8",
     letterSpacing: 2,
-    marginBottom: getSpacing(14),
+    marginBottom: 14,
   },
   codeActions: {
     flexDirection: "row",
@@ -418,8 +417,8 @@ const styles = StyleSheet.create({
   teamRow: {
     backgroundColor: "#fff",
     borderRadius: getBorderRadius(10),
-    padding: getSpacing(14),
-    marginBottom: getSpacing(8),
+    padding: 14,
+    marginBottom: 8,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -452,7 +451,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
     borderRadius: getBorderRadius(12),
-    padding: getSpacing(16),
+    padding: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -462,7 +461,7 @@ const styles = StyleSheet.create({
   stepRow: {
     flexDirection: "row",
     alignItems: "flex-start",
-    marginBottom: getSpacing(12),
+    marginBottom: 12,
   },
   stepNumber: {
     width: 24,

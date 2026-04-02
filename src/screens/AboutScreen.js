@@ -12,7 +12,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import {
   scaleFont,
   getHorizontalPadding,
-  getSpacing,
   getBorderRadius,
   useSafeArea,
   getSafeBottomPadding,
@@ -38,7 +37,7 @@ const AboutScreen = ({ navigation }) => {
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{
-          paddingBottom: getSafeBottomPadding(insets) + getSpacing(20),
+          paddingBottom: getSafeBottomPadding(insets) + 20,
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -160,7 +159,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: getHorizontalPadding(),
-    paddingVertical: getSpacing(14),
+    paddingVertical: 14,
   },
   backButton: {
     width: 40,
@@ -180,8 +179,8 @@ const styles = StyleSheet.create({
   },
   brandSection: {
     alignItems: "center",
-    paddingTop: getSpacing(30),
-    paddingBottom: getSpacing(10),
+    paddingTop: 30,
+    paddingBottom: 10,
   },
   logoContainer: {
     width: 90,
@@ -189,7 +188,7 @@ const styles = StyleSheet.create({
     borderRadius: 45,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: getSpacing(14),
+    marginBottom: 14,
   },
   appName: {
     fontSize: scaleFont(22),
@@ -226,7 +225,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     borderRadius: getBorderRadius(12),
-    padding: getSpacing(14),
+    padding: 14,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -249,18 +248,18 @@ const styles = StyleSheet.create({
   },
   section: {
     paddingHorizontal: getHorizontalPadding(),
-    marginTop: getSpacing(20),
+    marginTop: 20,
   },
   sectionTitle: {
     fontSize: scaleFont(16),
     fontWeight: "700",
     color: "#1f2937",
-    marginBottom: getSpacing(12),
+    marginBottom: 12,
   },
   card: {
     backgroundColor: "#fff",
     borderRadius: getBorderRadius(12),
-    padding: getSpacing(16),
+    padding: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -275,8 +274,8 @@ const styles = StyleSheet.create({
   featureCard: {
     backgroundColor: "#fff",
     borderRadius: getBorderRadius(12),
-    padding: getSpacing(14),
-    marginBottom: getSpacing(10),
+    padding: 14,
+    marginBottom: 10,
     flexDirection: "row",
     alignItems: "center",
     shadowColor: "#000",
@@ -308,7 +307,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(12),
     color: "#9ca3af",
     textAlign: "center",
-    marginTop: getSpacing(10),
+    marginTop: 10,
   },
 });
 

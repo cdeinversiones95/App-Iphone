@@ -14,7 +14,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import {
   scaleFont,
   getHorizontalPadding,
-  getSpacing,
   getBorderRadius,
   useSafeArea,
   getSafeBottomPadding,
@@ -103,7 +102,7 @@ const HelpCenterScreen = ({ navigation }) => {
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{
-          paddingBottom: getSafeBottomPadding(insets) + getSpacing(20),
+          paddingBottom: getSafeBottomPadding(insets) + 20,
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -235,7 +234,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: getHorizontalPadding(),
-    paddingVertical: getSpacing(14),
+    paddingVertical: 14,
   },
   backButton: {
     width: 40,
@@ -255,16 +254,16 @@ const styles = StyleSheet.create({
   },
   heroBanner: {
     marginHorizontal: getHorizontalPadding(),
-    marginTop: getSpacing(20),
+    marginTop: 20,
     borderRadius: getBorderRadius(16),
-    padding: getSpacing(24),
+    padding: 24,
     alignItems: "center",
   },
   heroTitle: {
     fontSize: scaleFont(20),
     fontWeight: "800",
     color: "#fff",
-    marginTop: getSpacing(10),
+    marginTop: 10,
   },
   heroSubtitle: {
     fontSize: scaleFont(13),
@@ -276,7 +275,7 @@ const styles = StyleSheet.create({
   contactButtons: {
     flexDirection: "row",
     gap: 12,
-    marginTop: getSpacing(18),
+    marginTop: 18,
   },
   whatsappBtn: {
     flexDirection: "row",
@@ -311,17 +310,17 @@ const styles = StyleSheet.create({
   phoneNumber: {
     fontSize: scaleFont(13),
     color: "#64748b",
-    marginTop: getSpacing(12),
+    marginTop: 12,
   },
   section: {
     paddingHorizontal: getHorizontalPadding(),
-    marginTop: getSpacing(20),
+    marginTop: 20,
   },
   sectionTitle: {
     fontSize: scaleFont(16),
     fontWeight: "700",
     color: "#1f2937",
-    marginBottom: getSpacing(12),
+    marginBottom: 12,
   },
   quickRow: {
     flexDirection: "row",
@@ -331,7 +330,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     borderRadius: getBorderRadius(12),
-    padding: getSpacing(16),
+    padding: 16,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -356,8 +355,8 @@ const styles = StyleSheet.create({
   faqCard: {
     backgroundColor: "#fff",
     borderRadius: getBorderRadius(12),
-    padding: getSpacing(14),
-    marginBottom: getSpacing(10),
+    padding: 14,
+    marginBottom: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -384,7 +383,7 @@ const styles = StyleSheet.create({
   stillHelpCard: {
     backgroundColor: "#eff6ff",
     borderRadius: getBorderRadius(14),
-    padding: getSpacing(20),
+    padding: 20,
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#bfdbfe",
@@ -400,7 +399,7 @@ const styles = StyleSheet.create({
     color: "#4b5563",
     textAlign: "center",
     lineHeight: scaleFont(13) * 1.5,
-    marginBottom: getSpacing(16),
+    marginBottom: 16,
   },
   stillHelpBtn: {
     flexDirection: "row",
