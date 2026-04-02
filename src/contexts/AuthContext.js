@@ -112,6 +112,29 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const result = await AuthService.signIn(username, password);
+      // MOBILE WEB FIX: no depender de onAuthStateChange para actualizar
+      // el estado — en Safari móvil el listener puede no dispararse si
+      // el storage falla. Actualizamos user/session directamente aquí.
+      if (!result.error && result.data?.user) {
+        setUser(result.data.user);
+        setSession(result.data.session);
+        // Cargar perfil de BD
+        try {
+          const { data: profile } = await AuthService.getUserProfile(
+            result.data.user.id,
+          );
+          setUserProfile(
+            profile || {
+              username:
+                result.data.user.user_metadata?.username || "Usuario",
+              display_name:
+                result.data.user.user_metadata?.display_name || "Usuario",
+              full_name:
+                result.data.user.user_metadata?.display_name || "Usuario",
+            },
+          );
+        } catch {}
+      }
       return result;
     } finally {
       setLoading(false);
@@ -122,6 +145,26 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const result = await AuthService.signUp(username, password, userData);
+      // MOBILE WEB FIX: igual que signIn, actualizar estado directamente
+      if (!result.error && result.data?.user) {
+        setUser(result.data.user);
+        setSession(result.data.session);
+        try {
+          const { data: profile } = await AuthService.getUserProfile(
+            result.data.user.id,
+          );
+          setUserProfile(
+            profile || {
+              username:
+                result.data.user.user_metadata?.username || "Usuario",
+              display_name:
+                result.data.user.user_metadata?.display_name || "Usuario",
+              full_name:
+                result.data.user.user_metadata?.display_name || "Usuario",
+            },
+          );
+        } catch {}
+      }
       return result;
     } finally {
       setLoading(false);
