@@ -46,6 +46,9 @@ const BankTransferScreen = ({ navigation }) => {
       code: "BRS",
       logo: BANK_LOGOS.BANRESERVAS,
       color: "#ef4444",
+      available: true,
+      accountNumber: "4229702175",
+      accountHolder: "Marino",
     },
     {
       id: 2,
@@ -53,6 +56,7 @@ const BankTransferScreen = ({ navigation }) => {
       code: "BPD",
       logo: BANK_LOGOS.POPULAR,
       color: "#3b82f6",
+      available: false,
     },
     {
       id: 3,
@@ -60,6 +64,7 @@ const BankTransferScreen = ({ navigation }) => {
       code: "BHD",
       logo: BANK_LOGOS.BHD,
       color: "#f59e0b",
+      available: false,
     },
   ];
 
@@ -133,8 +138,8 @@ const BankTransferScreen = ({ navigation }) => {
         paymentMethod: paymentMethod || {
           account_info: {
             bank_name: selectedBank.name,
-            account_number: "Contactar soporte",
-            account_holder: "CDE Inversiones",
+            account_number: selectedBank.accountNumber || "Contactar soporte",
+            account_holder: selectedBank.accountHolder || "CDE Inversiones",
           },
         },
         depositId: data.id,
@@ -178,8 +183,14 @@ const BankTransferScreen = ({ navigation }) => {
               {BANKS.map((bank) => (
                 <TouchableOpacity
                   key={bank.id}
-                  style={styles.bankCard}
-                  onPress={() => setSelectedBank(bank)}
+                  style={[styles.bankCard, !bank.available && styles.bankCardDisabled]}
+                  onPress={() => {
+                    if (!bank.available) {
+                      Alert.alert("Próximamente", `${bank.name} estará disponible pronto.`);
+                      return;
+                    }
+                    setSelectedBank(bank);
+                  }}
                 >
                   <LinearGradient
                     colors={[bank.color, bank.color + "dd"]}
@@ -187,20 +198,20 @@ const BankTransferScreen = ({ navigation }) => {
                   >
                     <Image
                       source={bank.logo}
-                      style={styles.bankLogo}
+                      style={[styles.bankLogo, !bank.available && { opacity: 0.5 }]}
                       resizeMode="contain"
                     />
                     <View style={styles.bankInfo}>
                       <Text style={styles.bankName}>{bank.name}</Text>
                       <Text style={styles.bankSubtext}>
-                        Transferencia inmediata
+                        {bank.available ? "Transferencia inmediata" : "Próximamente"}
                       </Text>
                     </View>
-                    <Ionicons
-                      name="chevron-forward"
-                      size={24}
-                      color="#ffffff"
-                    />
+                    {bank.available ? (
+                      <Ionicons name="chevron-forward" size={24} color="#ffffff" />
+                    ) : (
+                      <Ionicons name="time-outline" size={24} color="rgba(255,255,255,0.6)" />
+                    )}
                   </LinearGradient>
                 </TouchableOpacity>
               ))}
@@ -375,6 +386,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 4,
+  },
+  bankCardDisabled: {
+    opacity: 0.65,
   },
   bankGradient: {
     flexDirection: "row",
