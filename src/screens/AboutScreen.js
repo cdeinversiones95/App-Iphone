@@ -54,42 +54,73 @@ const AboutScreen = ({ navigation }) => {
           <Text style={styles.version}>Versión 1.0.0</Text>
         </View>
 
+        {/* FIFA Badge */}
+        <View style={styles.section}>
+          <View style={styles.fifaBadge}>
+            <Ionicons name="football-outline" size={22} color="#fbbf24" />
+            <Text style={styles.fifaBadgeText}>Empresa Oficial FIFA</Text>
+          </View>
+        </View>
+
         {/* Description */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>¿Qué es CDE?</Text>
+          <Text style={styles.sectionTitle}>¿Qué es CDE Inversiones?</Text>
           <View style={styles.card}>
             <Text style={styles.description}>
-              CDE Inversiones es una plataforma de inversiones deportivas que te
-              permite participar en eventos deportivos y obtener rendimientos
-              atractivos. Nuestra misión es ofrecer una experiencia segura,
-              transparente y accesible para todos.
+              CDE Inversiones es una compañía oficial vinculada a FIFA que opera
+              en la República Dominicana. Nos especializamos en inversiones
+              respaldadas por el fútbol mundial, permitiendo a nuestros usuarios
+              participar en eventos deportivos de alto nivel y obtener
+              rendimientos atractivos de manera segura y transparente.
             </Text>
+          </View>
+        </View>
+
+        {/* Presence */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Nuestra Presencia</Text>
+          <View style={styles.presenceRow}>
+            <View style={styles.presenceCard}>
+              <Ionicons name="flag-outline" size={26} color="#3b82f6" />
+              <Text style={styles.presenceTitle}>República Dominicana</Text>
+              <Text style={styles.presenceDesc}>Sede principal de operaciones</Text>
+            </View>
+            <View style={styles.presenceCard}>
+              <Ionicons name="football-outline" size={26} color="#fbbf24" />
+              <Text style={styles.presenceTitle}>FIFA</Text>
+              <Text style={styles.presenceDesc}>Respaldo y certificación oficial</Text>
+            </View>
           </View>
         </View>
 
         {/* Features */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Características</Text>
+          <Text style={styles.sectionTitle}>¿Por qué elegirnos?</Text>
           {[
             {
               icon: "shield-checkmark-outline",
-              title: "Seguridad",
-              desc: "Tus fondos y datos protegidos con la mejor tecnología.",
+              title: "Respaldado por FIFA",
+              desc: "Empresa certificada con operación oficial en el mundo del fútbol.",
             },
             {
-              icon: "flash-outline",
-              title: "Rapidez",
-              desc: "Depósitos y retiros procesados de forma ágil.",
+              icon: "flag-outline",
+              title: "Operando en RD",
+              desc: "Presencia física en República Dominicana con soporte local.",
+            },
+            {
+              icon: "trending-up-outline",
+              title: "Inversiones en Football",
+              desc: "Genera rendimientos participando en eventos FIFA y ligas internacionales.",
             },
             {
               icon: "people-outline",
               title: "Programa de Referidos",
-              desc: "Gana comisiones invitando a tus amigos.",
+              desc: "Gana comisiones invitando a tus amigos a la plataforma.",
             },
             {
               icon: "star-outline",
               title: "Niveles VIP",
-              desc: "Beneficios exclusivos según tu nivel de inversión.",
+              desc: "Beneficios exclusivos y mayores tasas según tu nivel de inversión.",
             },
           ].map((item, index) => (
             <View key={index} style={styles.featureCard}>
@@ -165,6 +196,52 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(13),
     color: "#9ca3af",
     marginTop: 4,
+  },
+  fifaBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fef9ec",
+    borderRadius: getBorderRadius(20),
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    alignSelf: "flex-start",
+    borderWidth: 1,
+    borderColor: "#fbbf24",
+    gap: 8,
+  },
+  fifaBadgeText: {
+    fontSize: scaleFont(13),
+    fontWeight: "700",
+    color: "#b45309",
+  },
+  presenceRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  presenceCard: {
+    flex: 1,
+    backgroundColor: "#fff",
+    borderRadius: getBorderRadius(12),
+    padding: getSpacing(14),
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  presenceTitle: {
+    fontSize: scaleFont(13),
+    fontWeight: "700",
+    color: "#1f2937",
+    marginTop: 6,
+    textAlign: "center",
+  },
+  presenceDesc: {
+    fontSize: scaleFont(11),
+    color: "#6b7280",
+    marginTop: 4,
+    textAlign: "center",
   },
   section: {
     paddingHorizontal: getHorizontalPadding(),

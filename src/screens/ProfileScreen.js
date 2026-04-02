@@ -283,7 +283,7 @@ const ProfileScreen = ({ navigation }) => {
       id: 9,
       title: "Partner",
       icon: "people-circle-outline",
-      onPress: () => navigation.navigate("Partner"),
+      onPress: () => navigation.navigate("AgentCenter"),
     },
   ];
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,13 +6,12 @@ import {
   ScrollView,
   TouchableOpacity,
   Linking,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import {
-  scaleWidth,
-  scaleHeight,
   scaleFont,
   getHorizontalPadding,
   getSpacing,
@@ -21,21 +20,24 @@ import {
   getSafeBottomPadding,
 } from "../utils/responsive";
 
+const SUPPORT_PHONE = "+40376300829";
+const SUPPORT_PHONE_DISPLAY = "+40 376 300 829";
+
 const FAQ_ITEMS = [
   {
     question: "¿Cómo realizo una recarga?",
     answer:
-      'Ve a tu perfil, presiona "Recargar" y selecciona el método de pago de tu preferencia (transferencia bancaria o USDT). Sigue las instrucciones en pantalla para completar el depósito.',
+      'Ve a tu perfil, presiona "Recargar" y selecciona el método de pago (transferencia bancaria o USDT). Sigue las instrucciones en pantalla para completar el depósito.',
   },
   {
     question: "¿Cuánto tarda en acreditarse mi depósito?",
     answer:
-      "Los depósitos por transferencia bancaria pueden tardar entre 5 y 30 minutos en acreditarse. Los depósitos en USDT se acreditan una vez confirmada la transacción en la red.",
+      "Los depósitos por transferencia bancaria pueden tardar entre 5 y 30 minutos. Los depósitos en USDT se acreditan una vez confirmada la transacción en la red.",
   },
   {
     question: "¿Cómo retiro mis fondos?",
     answer:
-      'Desde tu perfil, presiona "Retirar", ingresa el monto y los datos de tu cuenta bancaria. Los retiros se procesan en un plazo de 24 a 48 horas hábiles.',
+      'Desde tu perfil, presiona "Retirar", ingresa el monto y los datos de tu cuenta. Los retiros se procesan en un plazo de 24 a 48 horas hábiles.',
   },
   {
     question: "¿Qué son los niveles VIP?",
@@ -45,15 +47,40 @@ const FAQ_ITEMS = [
   {
     question: "¿Cómo funciona el programa de referidos?",
     answer:
-      "Comparte tu código de invitación con amigos. Cuando se registren y realicen depósitos, recibirás comisiones según tu nivel de agente.",
+      "Comparte tu código de invitación con amigos. Cuando se registren y depositen, recibirás comisiones según tu nivel de agente.",
+  },
+  {
+    question: "¿Es segura mi inversión?",
+    answer:
+      "CDE Inversiones opera bajo supervisión oficial y respaldo FIFA. Tus fondos están protegidos y cada transacción es registrada y verificable.",
   },
 ];
 
 const HelpCenterScreen = ({ navigation }) => {
   const insets = useSafeArea();
+  const [expandedFaq, setExpandedFaq] = useState(null);
 
-  const handleContactSupport = () => {
-    Linking.openURL("mailto:soporte@cde.com");
+  const handleWhatsApp = () => {
+    const url = `https://wa.me/${SUPPORT_PHONE.replace(/[^0-9]/g, "")}`;
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (supported) {
+          Linking.openURL(url);
+        } else {
+          Alert.alert("WhatsApp no disponible", `Contáctanos al ${SUPPORT_PHONE_DISPLAY}`);
+        }
+      })
+      .catch(() =>
+        Alert.alert("Error", `Contáctanos al ${SUPPORT_PHONE_DISPLAY}`)
+      );
+  };
+
+  const handleCall = () => {
+    Linking.openURL(`tel:${SUPPORT_PHONE}`);
+  };
+
+  const toggleFaq = (index) => {
+    setExpandedFaq(expandedFaq === index ? null : index);
   };
 
   return (
@@ -77,11 +104,72 @@ const HelpCenterScreen = ({ navigation }) => {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {/* FAQ Section */}
+        {/* Hero banner */}
+        <LinearGradient
+          colors={["#1e3a5f", "#1e293b"]}
+          style={styles.heroBanner}
+        >
+          <Ionicons name="headset" size={40} color="#3b82f6" />
+          <Text style={styles.heroTitle}>Soporte 24/7</Text>
+          <Text style={styles.heroSubtitle}>
+            Nuestro equipo está listo para ayudarte en todo momento.
+          </Text>
+
+          {/* Contact buttons */}
+          <View style={styles.contactButtons}>
+            <TouchableOpacity
+              style={styles.whatsappBtn}
+              onPress={handleWhatsApp}
+            >
+              <Ionicons name="logo-whatsapp" size={22} color="#fff" />
+              <Text style={styles.whatsappBtnText}>WhatsApp</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.callBtn} onPress={handleCall}>
+              <Ionicons name="call-outline" size={22} color="#3b82f6" />
+              <Text style={styles.callBtnText}>Llamar</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.phoneNumber}>{SUPPORT_PHONE_DISPLAY}</Text>
+        </LinearGradient>
+
+        {/* Quick actions */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Contacto Rápido</Text>
+          <View style={styles.quickRow}>
+            {[
+              { icon: "logo-whatsapp", label: "Chat\nWhatsApp", color: "#25D366", onPress: handleWhatsApp },
+              { icon: "call-outline", label: "Llamada\nDirecta", color: "#3b82f6", onPress: handleCall },
+            ].map((item, i) => (
+              <TouchableOpacity
+                key={i}
+                style={styles.quickCard}
+                onPress={item.onPress}
+              >
+                <View
+                  style={[
+                    styles.quickIcon,
+                    { backgroundColor: item.color + "1A" },
+                  ]}
+                >
+                  <Ionicons name={item.icon} size={28} color={item.color} />
+                </View>
+                <Text style={styles.quickLabel}>{item.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* FAQ */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Preguntas Frecuentes</Text>
           {FAQ_ITEMS.map((item, index) => (
-            <View key={index} style={styles.faqCard}>
+            <TouchableOpacity
+              key={index}
+              style={styles.faqCard}
+              onPress={() => toggleFaq(index)}
+              activeOpacity={0.8}
+            >
               <View style={styles.faqHeader}>
                 <Ionicons
                   name="help-circle"
@@ -90,26 +178,36 @@ const HelpCenterScreen = ({ navigation }) => {
                   style={{ marginRight: 8 }}
                 />
                 <Text style={styles.faqQuestion}>{item.question}</Text>
+                <Ionicons
+                  name={expandedFaq === index ? "chevron-up" : "chevron-down"}
+                  size={18}
+                  color="#9ca3af"
+                />
               </View>
-              <Text style={styles.faqAnswer}>{item.answer}</Text>
-            </View>
+              {expandedFaq === index && (
+                <Text style={styles.faqAnswer}>{item.answer}</Text>
+              )}
+            </TouchableOpacity>
           ))}
         </View>
 
-        {/* Contact Section */}
+        {/* Still need help */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>¿Necesitas más ayuda?</Text>
-          <TouchableOpacity
-            style={styles.contactCard}
-            onPress={handleContactSupport}
-          >
-            <Ionicons name="mail-outline" size={28} color="#3b82f6" />
-            <View style={{ marginLeft: 12, flex: 1 }}>
-              <Text style={styles.contactTitle}>Correo de Soporte</Text>
-              <Text style={styles.contactText}>soporte@cde.com</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-          </TouchableOpacity>
+          <View style={styles.stillHelpCard}>
+            <Text style={styles.stillHelpTitle}>¿Aún necesitas ayuda?</Text>
+            <Text style={styles.stillHelpText}>
+              Habla directamente con un agente de soporte de CDE Inversiones.
+            </Text>
+            <TouchableOpacity
+              style={styles.stillHelpBtn}
+              onPress={handleWhatsApp}
+            >
+              <Ionicons name="logo-whatsapp" size={20} color="#fff" />
+              <Text style={styles.stillHelpBtnText}>
+                Hablar con un agente
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -144,6 +242,66 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  heroBanner: {
+    marginHorizontal: getHorizontalPadding(),
+    marginTop: getSpacing(20),
+    borderRadius: getBorderRadius(16),
+    padding: getSpacing(24),
+    alignItems: "center",
+  },
+  heroTitle: {
+    fontSize: scaleFont(20),
+    fontWeight: "800",
+    color: "#fff",
+    marginTop: getSpacing(10),
+  },
+  heroSubtitle: {
+    fontSize: scaleFont(13),
+    color: "#9ca3af",
+    textAlign: "center",
+    marginTop: 6,
+    lineHeight: scaleFont(13) * 1.5,
+  },
+  contactButtons: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: getSpacing(18),
+  },
+  whatsappBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#25D366",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: getBorderRadius(10),
+    gap: 8,
+  },
+  whatsappBtnText: {
+    fontSize: scaleFont(14),
+    fontWeight: "700",
+    color: "#fff",
+  },
+  callBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(59,130,246,0.15)",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: getBorderRadius(10),
+    borderWidth: 1,
+    borderColor: "#3b82f6",
+    gap: 8,
+  },
+  callBtnText: {
+    fontSize: scaleFont(14),
+    fontWeight: "700",
+    color: "#3b82f6",
+  },
+  phoneNumber: {
+    fontSize: scaleFont(13),
+    color: "#64748b",
+    marginTop: getSpacing(12),
+  },
   section: {
     paddingHorizontal: getHorizontalPadding(),
     marginTop: getSpacing(20),
@@ -153,6 +311,36 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#1f2937",
     marginBottom: getSpacing(12),
+  },
+  quickRow: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  quickCard: {
+    flex: 1,
+    backgroundColor: "#fff",
+    borderRadius: getBorderRadius(12),
+    padding: getSpacing(16),
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  quickIcon: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
+  },
+  quickLabel: {
+    fontSize: scaleFont(12),
+    fontWeight: "600",
+    color: "#1f2937",
+    textAlign: "center",
   },
   faqCard: {
     backgroundColor: "#fff",
@@ -168,7 +356,6 @@ const styles = StyleSheet.create({
   faqHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
   },
   faqQuestion: {
     fontSize: scaleFont(14),
@@ -181,18 +368,42 @@ const styles = StyleSheet.create({
     color: "#6b7280",
     lineHeight: scaleFont(13) * 1.5,
     paddingLeft: 28,
+    marginTop: 8,
   },
-  contactCard: {
-    backgroundColor: "#fff",
-    borderRadius: getBorderRadius(12),
-    padding: getSpacing(16),
+  stillHelpCard: {
+    backgroundColor: "#eff6ff",
+    borderRadius: getBorderRadius(14),
+    padding: getSpacing(20),
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#bfdbfe",
+  },
+  stillHelpTitle: {
+    fontSize: scaleFont(16),
+    fontWeight: "700",
+    color: "#1d4ed8",
+    marginBottom: 6,
+  },
+  stillHelpText: {
+    fontSize: scaleFont(13),
+    color: "#4b5563",
+    textAlign: "center",
+    lineHeight: scaleFont(13) * 1.5,
+    marginBottom: getSpacing(16),
+  },
+  stillHelpBtn: {
     flexDirection: "row",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
+    backgroundColor: "#25D366",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: getBorderRadius(10),
+    gap: 8,
+  },
+  stillHelpBtnText: {
+    fontSize: scaleFont(14),
+    fontWeight: "700",
+    color: "#fff",
   },
   contactTitle: {
     fontSize: scaleFont(14),
