@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { format } from "date-fns";
 
@@ -565,6 +565,54 @@ export default function WalletsPage() {
     }
   }, [currentView]);
 
+  const parseUserNotes = (
+    notes: string | null | undefined,
+  ): React.ReactNode => {
+    if (!notes) return "Sin notas";
+    try {
+      const parsed = JSON.parse(notes);
+      const methodLabels: Record<string, string> = {
+        bank_transfer: "Transferencia Bancaria",
+        cash: "Efectivo",
+        card: "Tarjeta",
+      };
+      const method =
+        methodLabels[parsed.method] || parsed.method || "Desconocido";
+      const details = parsed.details || {};
+      return (
+        <div className="space-y-1">
+          <p>
+            <span className="font-medium">Método:</span> {method}
+          </p>
+          {details.bank_name && (
+            <p>
+              <span className="font-medium">Banco:</span> {details.bank_name}
+            </p>
+          )}
+          {details.account_number && (
+            <p>
+              <span className="font-medium">No. Cuenta:</span>{" "}
+              {details.account_number}
+            </p>
+          )}
+          {details.account_holder && (
+            <p>
+              <span className="font-medium">Titular:</span>{" "}
+              {details.account_holder}
+            </p>
+          )}
+          {details.phone && (
+            <p>
+              <span className="font-medium">Teléfono:</span> {details.phone}
+            </p>
+          )}
+        </div>
+      );
+    } catch {
+      return notes;
+    }
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto p-6">
@@ -624,12 +672,8 @@ export default function WalletsPage() {
                 <p className="text-xs font-medium text-gray-600">
                   Total Depositado
                 </p>
-                <p className="text-lg font-bold text-green-600">
-                  RD$
-                  {totalDeposited.toLocaleString("es-DO", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                <p className="text-lg font-bold text-green-600 whitespace-nowrap">
+                  {`RD$${totalDeposited.toLocaleString("es-DO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 </p>
               </div>
             </div>
@@ -644,12 +688,8 @@ export default function WalletsPage() {
                 <p className="text-xs font-medium text-gray-600">
                   Total Retirado
                 </p>
-                <p className="text-lg font-bold text-orange-600">
-                  RD$
-                  {totalWithdrawn.toLocaleString("es-DO", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                <p className="text-lg font-bold text-orange-600 whitespace-nowrap">
+                  {`RD$${totalWithdrawn.toLocaleString("es-DO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 </p>
               </div>
             </div>
@@ -664,12 +704,8 @@ export default function WalletsPage() {
                 <p className="text-xs font-medium text-gray-600">
                   Balance en Sistema
                 </p>
-                <p className="text-lg font-bold text-blue-600">
-                  RD$
-                  {totalBalance.toLocaleString("es-DO", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                <p className="text-lg font-bold text-blue-600 whitespace-nowrap">
+                  {`RD$${totalBalance.toLocaleString("es-DO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 </p>
               </div>
             </div>
@@ -684,12 +720,8 @@ export default function WalletsPage() {
                 <p className="text-xs font-medium text-gray-600">
                   Total Perdido
                 </p>
-                <p className="text-lg font-bold text-red-600">
-                  RD$
-                  {totalLost.toLocaleString("es-DO", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                <p className="text-lg font-bold text-red-600 whitespace-nowrap">
+                  {`RD$${totalLost.toLocaleString("es-DO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 </p>
               </div>
             </div>
@@ -764,12 +796,8 @@ export default function WalletsPage() {
                             </p>
                           </div>
                           <div className="ml-4 text-right">
-                            <p className="text-3xl font-bold text-red-600">
-                              RD$
-                              {withdrawal.amount.toLocaleString("es-DO", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}
+                            <p className="text-3xl font-bold text-red-600 whitespace-nowrap">
+                              {`RD$${withdrawal.amount.toLocaleString("es-DO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                             </p>
                             <p className="text-sm text-gray-500">
                               {withdrawal.fee
@@ -795,9 +823,9 @@ export default function WalletsPage() {
                             <p className="text-sm font-medium text-gray-700">
                               Notas del Usuario
                             </p>
-                            <p className="text-sm text-gray-900">
-                              {withdrawal.user_notes || "Sin notas"}
-                            </p>
+                            <div className="text-sm text-gray-900">
+                              {parseUserNotes(withdrawal.user_notes)}
+                            </div>
                           </div>
                         </div>
 
